@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - 'change-this-value-to-main-to-enable-this-action'
+      - 'main'
 
 jobs:
   release:
