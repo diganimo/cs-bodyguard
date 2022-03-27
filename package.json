@@ -1,0 +1,30 @@
+{
+  "name": "diacrory",
+  "version": "0.0.1-alpha.1",
+  "description": "Common lib for diamory.",
+  "contributors": [
+    {
+      "name": "Mark Herrmann",
+      "email": "mark.herrmann@diamory.de"
+    }
+  ],
+  "private": false,
+  "main": "index.ts",
+  "types": "tbd",
+  "dependencies": {},
+  "devDependencies": {
+    "assertthat": "6.5.2",
+    "roboter": "13.0.0"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/diamory/diamory-common.git"
+  },
+  "keywords": [
+    "diamory",
+    "common",
+    "lib"
+  ],
+  "license": "AGPL-3.0-or-later"
+}

@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - 'change-this-value-to-main-to-enable-this-action'
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Install dependencies
+      run: |
+        npm install
+    - name: Run roboter
+      run: |
+        npx roboter
+    - name: Compile TypeScript
+      run: |
+        npx roboter build
+    - name: Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN_MH }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN_MH }}
+      run: npx semantic-release
