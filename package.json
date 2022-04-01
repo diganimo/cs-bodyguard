@@ -12,7 +12,6 @@
   "main": "index.ts",
   "types": "tbd",
   "dependencies": {
-    "buffer": "6.0.3",
     "localforage": "1.10.0",
     "node-forge": "1.3.1",
     "react-native-fs": "2.19.0",
