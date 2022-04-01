@@ -18,15 +18,12 @@ export default {
 
   async writeFile (filePath: string, value: string, encoding: string): Promise<void> {
     const foundEntry = mockedDirectory.find((entry): boolean => entry.path === filePath && entry.encoding === encoding);
-    const date = new Date();
-
-    date.setTime(JSON.parse(value).timestamp);
 
     const entry = {
       path: filePath,
       contents: value,
       encoding,
-      mtime: date,
+      mtime: new Date(),
       isFile
     };
 
@@ -58,6 +55,16 @@ export default {
 
   async readDir (dirPath: string): Promise<MockedFileEntry[]> {
     return dirPath === testDir ? [ ...mockedDirectory ] : [];
+  },
+
+  async touch (filePath: string, mtime: Date): Promise<void> {
+    const foundEntry = mockedDirectory.find((entry): boolean => entry.path === filePath);
+
+    if (!foundEntry) {
+      return;
+    }
+
+    foundEntry.mtime = mtime;
   },
 
   clear (): void {

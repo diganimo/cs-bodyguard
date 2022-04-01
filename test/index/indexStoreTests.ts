@@ -65,8 +65,12 @@ const getItemFromNativeStore = async function (id: string): Promise<IndexItem | 
 const setItemToNativeStore = async function (item: IndexItem): Promise<void> {
   const path = `${reactNativeFsMock.DocumentDirectoryPath}/${item.id}`;
   const itemString = JSON.stringify(item);
+  const date = new Date();
+
+  date.setTime(item.timestamp);
 
   await reactNativeFsMock.writeFile(path, itemString, 'utf-8');
+  await reactNativeFsMock.touch(path, date);
 };
 
 const storeTestResources = [

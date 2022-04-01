@@ -16,8 +16,12 @@ const nativeIndexStore: IndexStore = {
   async setItem ({ item }: { item: IndexItem }): Promise<void> {
     const path = getPath(item.id);
     const itemString = JSON.stringify(item);
+    const date = new Date();
+
+    date.setTime(item.timestamp);
 
     await reactNativeFs.writeFile(path, itemString, encoding);
+    await reactNativeFs.touch(path, date);
   },
 
   async getItem ({ id }: { id: string }): Promise<IndexItem> {
