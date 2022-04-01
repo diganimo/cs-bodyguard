@@ -3,7 +3,9 @@ import { browserIndexStore } from '../../lib/index/browserIndexStore';
 import { IndexItem } from 'lib/index/indexItems/indexItem';
 import localforage from 'localforage';
 import memoryStorageDriver from 'localforage-memoryStorageDriver';
+import { nativeIndexStore } from '../../lib/index/nativeIndexStore';
 import { noSuchIndexItemException } from '../../lib/exceptions';
+import reactNativeFsMock from '../mocks/reactNativeFsMock';
 
 const testItem: IndexItem = {
   id: 'testId',
@@ -37,12 +39,34 @@ const setupBrowserStoreAfterEach = async function (): Promise<void> {
   await localforage.clear();
 };
 
+const setupNativeStoreBeforeEach = async function (): Promise<void> {
+  // Nothing to do
+};
+
+const setupNativeStoreAfterEach = async function (): Promise<void> {
+  reactNativeFsMock.clear();
+};
+
 const getItemFromBrowserStore = async function (id: string): Promise<IndexItem | null> {
   return await localforage.getItem(id) ?? null;
 };
 
 const setItemToBrowserStore = async function (item: IndexItem): Promise<void> {
   await localforage.setItem(item.id, item);
+};
+
+const getItemFromNativeStore = async function (id: string): Promise<IndexItem | null> {
+  const path = `${reactNativeFsMock.DocumentDirectoryPath}/${id}`;
+  const itemString = await reactNativeFsMock.readFile(path, 'utf-8');
+
+  return itemString === '' ? null : JSON.parse(itemString);
+};
+
+const setItemToNativeStore = async function (item: IndexItem): Promise<void> {
+  const path = `${reactNativeFsMock.DocumentDirectoryPath}/${item.id}`;
+  const itemString = JSON.stringify(item);
+
+  await reactNativeFsMock.writeFile(path, itemString, 'utf-8');
 };
 
 const storeTestResources = [
@@ -53,6 +77,14 @@ const storeTestResources = [
     storeSetupAfterEach: setupBrowserStoreAfterEach,
     getItem: getItemFromBrowserStore,
     setItem: setItemToBrowserStore
+  },
+  {
+    suiteName: 'IndexStore - native',
+    store: nativeIndexStore,
+    storeSetupBeforeEach: setupNativeStoreBeforeEach,
+    storeSetupAfterEach: setupNativeStoreAfterEach,
+    getItem: getItemFromNativeStore,
+    setItem: setItemToNativeStore
   }
 ];
 
