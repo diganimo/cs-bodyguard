@@ -25,7 +25,8 @@
   },
   "scripts": {
     "build": "npx roboter build",
-    "qa": "npx roboter analyze && npx roboter deps && echo '' && echo ▸ Running tests via jest... && jest"
+    "qa": "npx roboter analyze && npx roboter deps && echo '' && echo ▸ Running tests via jest... && jest",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
