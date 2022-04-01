@@ -1,3 +1,4 @@
+import { IndexDelta } from './indexDelta';
 import { IndexItem } from './indexItems/indexItem';
 import { IndexStore } from './indexStore';
 import { noSuchIndexItemException } from '../exceptions';
@@ -47,34 +48,22 @@ const nativeIndexStore: IndexStore = {
     await reactNativeFs.unlink(path);
   },
 
-  async getAllRecentItems ({ timestamp }: { timestamp: number }): Promise<IndexItem[]> {
+  async getDelta ({ timestampSinceLastDelta }: { timestampSinceLastDelta: number }): Promise<IndexDelta[]> {
     const fileEntryList = await reactNativeFs.readDir(directory);
-    const items: IndexItem[] = [];
+    const items: IndexDelta[] = [];
 
     for (const entry of fileEntryList) {
-      if (!entry.isFile() || !entry.mtime || entry.mtime.getTime() <= timestamp) {
+      if (!entry.isFile() || !entry.mtime || entry.mtime.getTime() <= timestampSinceLastDelta) {
         continue;
       }
       const itemString = await reactNativeFs.readFile(entry.path, encoding);
       const item = JSON.parse(itemString);
+      const { id, timestamp } = item;
 
-      items.push(item);
+      items.push({ id, timestamp });
     }
 
     return items;
-  },
-
-  async countAllRecentItems ({ timestamp }: { timestamp: number }): Promise<number> {
-    const fileEntryList = await reactNativeFs.readDir(directory);
-    let count = 0;
-
-    for (const entry of fileEntryList) {
-      if (entry.isFile() && entry.mtime && entry.mtime.getTime() > timestamp) {
-        count += 1;
-      }
-    }
-
-    return count;
   },
 
   async deleteAllItems (): Promise<void> {

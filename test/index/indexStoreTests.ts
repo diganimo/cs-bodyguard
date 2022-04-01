@@ -40,7 +40,7 @@ const setupBrowserStoreAfterEach = async function (): Promise<void> {
 };
 
 const setupNativeStoreBeforeEach = async function (): Promise<void> {
-  // Nothing to do
+  // No-Op
 };
 
 const setupNativeStoreAfterEach = async function (): Promise<void> {
@@ -122,46 +122,31 @@ for (const resource of storeTestResources) {
           assert.that(item.hmac).is.equalTo(testItem.hmac);
           assert.that(item.timestamp).is.equalTo(testItem.timestamp);
         });
-
-        test('Gets all 2 items from store.', async (): Promise<void> => {
-          await setItem(testItem);
-          await setItem(anotherTestItem);
-
-          const items = await store.getAllRecentItems({ timestamp: -1 });
-
-          assert.that(items.length).is.equalTo(2);
-          assert.that(items[0].id).is.equalTo(testItem.id);
-          assert.that(items[1].id).is.equalTo(anotherTestItem.id);
-        });
-
-        test('Gets most recent item from store.', async (): Promise<void> => {
-          await setItem(testItem);
-          await setItem(anotherTestItem);
-
-          const items = await store.getAllRecentItems({ timestamp: 200 });
-
-          assert.that(items.length).is.equalTo(1);
-          assert.that(items[0].id).is.equalTo(anotherTestItem.id);
-        });
       });
 
-      describe('count', (): void => {
-        test('Counts all 2 items from store.', async (): Promise<void> => {
+      describe('delta', (): void => {
+        test('Gets delta for all 2 items.', async (): Promise<void> => {
           await setItem(testItem);
           await setItem(anotherTestItem);
 
-          const count = await store.countAllRecentItems({ timestamp: -1 });
+          const delta = await store.getDelta({ timestampSinceLastDelta: 0 });
 
-          assert.that(count).is.equalTo(2);
+          assert.that(delta.length).is.equalTo(2);
+          assert.that(delta[0].id).is.equalTo(testItem.id);
+          assert.that(delta[1].id).is.equalTo(anotherTestItem.id);
+          assert.that(delta[0].timestamp).is.equalTo(testItem.timestamp);
+          assert.that(delta[1].timestamp).is.equalTo(anotherTestItem.timestamp);
         });
 
-        test('Counts most recent item from store.', async (): Promise<void> => {
+        test('Gets delta for most recent item.', async (): Promise<void> => {
           await setItem(testItem);
           await setItem(anotherTestItem);
 
-          const count = await store.countAllRecentItems({ timestamp: 200 });
+          const delta = await store.getDelta({ timestampSinceLastDelta: 100 });
 
-          assert.that(count).is.equalTo(1);
+          assert.that(delta.length).is.equalTo(1);
+          assert.that(delta[0].id).is.equalTo(anotherTestItem.id);
+          assert.that(delta[0].timestamp).is.equalTo(anotherTestItem.timestamp);
         });
       });
 

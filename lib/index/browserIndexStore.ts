@@ -1,3 +1,4 @@
+import { IndexDelta } from './indexDelta';
 import { IndexItem } from './indexItems/indexItem';
 import { IndexStore } from './indexStore';
 import localforage from 'localforage';
@@ -32,46 +33,32 @@ const browserIndexStore: BrowserIndexStore = {
     await localforage.removeItem(id);
   },
 
-  async useInMemory (memoryStorageDriver: any): Promise<void> {
-    await localforage.defineDriver(memoryStorageDriver);
-
-    // eslint-disable-next-line no-underscore-dangle
-    await localforage.setDriver(memoryStorageDriver._driver);
-  },
-
-  async getAllRecentItems ({ timestamp }: { timestamp: number }): Promise<IndexItem[]> {
-    const items: IndexItem[] = [];
+  async getDelta ({ timestampSinceLastDelta }: { timestampSinceLastDelta: number }): Promise<IndexDelta[]> {
+    const items: IndexDelta[] = [];
     const keys = await localforage.keys();
 
     for (const key of keys) {
       const item = await this.getItem({ id: key });
 
-      if (item.timestamp > timestamp) {
-        items.push(item);
+      if (item.timestamp > timestampSinceLastDelta) {
+        const { id, timestamp } = item;
+
+        items.push({ id, timestamp });
       }
     }
 
     return items;
   },
 
-  async countAllRecentItems ({ timestamp }: { timestamp: number }): Promise<number> {
-    const keys = await localforage.keys();
-
-    let count = 0;
-
-    for (const key of keys) {
-      const item = await this.getItem({ id: key });
-
-      if (item.timestamp > timestamp) {
-        count += 1;
-      }
-    }
-
-    return count;
-  },
-
   async deleteAllItems (): Promise<void> {
     await localforage.clear();
+  },
+
+  async useInMemory (memoryStorageDriver: any): Promise<void> {
+    await localforage.defineDriver(memoryStorageDriver);
+
+    // eslint-disable-next-line no-underscore-dangle
+    await localforage.setDriver(memoryStorageDriver._driver);
   }
 
 };
