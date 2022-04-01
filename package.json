@@ -11,12 +11,23 @@
   "private": false,
   "main": "index.ts",
   "types": "tbd",
-  "dependencies": {},
+  "dependencies": {
+    "localforage": "1.10.0",
+    "react-native-fs": "2.19.0",
+    "uuid": "8.3.2"
+  },
   "devDependencies": {
     "assertthat": "6.5.2",
-    "roboter": "13.0.0"
+    "jest": "27.5.1",
+    "localforage-memoryStorageDriver": "0.9.2",
+    "roboter": "13.0.0",
+    "ts-jest": "27.1.4"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "npx roboter build",
+    "qa": "npx roboter analyze && npx roboter deps && echo '' && echo ▸ Running tests via jest... && jest",
+    "test": "jest"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/diamory/diamory-common.git"
@@ -26,5 +37,14 @@
     "common",
     "lib"
   ],
-  "license": "AGPL-3.0-or-later"
+  "license": "AGPL-3.0-or-later",
+  "jest": {
+    "preset": "ts-jest",
+    "testMatch": [
+      "**/test/**/*Tests.[jt]s?(x)"
+    ],
+    "moduleNameMapper": {
+      "react-native-fs": "<rootDir>/test/mocks/reactNativeFsMock.ts"
+    }
+  }
 }
