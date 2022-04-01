@@ -56,7 +56,6 @@ export default {
     mockedDirectory.splice(index, 1);
   },
 
-  // //eslint-disable-next-line @typescript-eslint/no-unused-vars
   async readDir (dirPath: string): Promise<MockedFileEntry[]> {
     return dirPath === testDir ? [ ...mockedDirectory ] : [];
   },
