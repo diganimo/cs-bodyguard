@@ -27,13 +27,19 @@ npm install diamory-common
 ## QA
 For code analyses and automatic tests, run:
 ```bash
-npx roboter
+npm run qa
+```
+
+### Tests only
+For automatic tests only, run:
+```bash
+npm run test
 ```
 
 ## Build
 Build with:
 ```bash
-npx roboter build
+npm run build
 ```
 
 ## Import
