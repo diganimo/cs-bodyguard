@@ -1,5 +1,4 @@
 import { assert } from 'assertthat';
-import { Buffer } from 'buffer';
 import { getRandomBuffer } from '../../lib/crypto/random';
 
 const lengthsToTest = [ 12, 32, 42 ];
