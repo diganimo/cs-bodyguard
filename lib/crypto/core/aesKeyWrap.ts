@@ -1,6 +1,7 @@
-// Implemented, following this specification: https://www.heise.de/netze/rfc/rfcs/rfc3394.shtml
-// testet, using this test vector: https://datatracker.ietf.org/doc/html/rfc3394#section-4.6
-// also tested with random values, checking the formular: key = unwrap(wrap(key, kek), kek)
+// Implemented, following this specification: https://www.heise.de/netze/rfc/rfcs/rfc3394.shtml,
+// originated by http://csrc.nist.gov/encryption/kms/key-wrap.pdf
+// Testet, using this test vector: https://datatracker.ietf.org/doc/html/rfc3394#section-4.6
+// Also tested with random values, checking the formular: key = unwrap(wrap(key, kek), kek)
 
 /* eslint-disable id-length */
 /* eslint-disable no-bitwise */
