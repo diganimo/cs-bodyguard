@@ -7,10 +7,36 @@
 
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
-import { unauthenticException } from '../exceptions';
+
+const invalidKeyDataLengthException = new Error('Invalid KeyData length. Length must be multiple of and at least 16 byte.');
+const invalidWrappedKeyDataLengthException = new Error('Invalid wrapped KeyData length. Length must be multiple of and at least 24 byte.');
+const invalidKekLengthException = new Error('Invalid kek length. Length must be 32 byte.');
+const unauthenticException = new Error('Inregrity check failed. Wrong kek?');
 
 const iv = Buffer.from('A6A6A6A6A6A6A6A6', 'hex');
 const paddingOf16Byte = Buffer.from('10101010101010101010101010101010', 'hex');
+
+const checkKekLength = (kek: Buffer): void => {
+  if (kek.length !== 32) {
+    throw invalidKekLengthException;
+  }
+};
+
+const checkWrapInputLengths = (key: Buffer, kek: Buffer): void => {
+  if ((key.length % 8) > 0 || key.length < 16) {
+    throw invalidKeyDataLengthException;
+  }
+
+  checkKekLength(kek);
+};
+
+const checkUnwrapInputLengths = (wrappedKey: Buffer, kek: Buffer): void => {
+  if ((wrappedKey.length % 8) > 0 || wrappedKey.length < 24) {
+    throw invalidWrappedKeyDataLengthException;
+  }
+
+  checkKekLength(kek);
+};
 
 const aesEncrypt = (key: Buffer, plaintext: Buffer): Buffer => {
   const keyForgeBuffer = forge.util.createBuffer(key, 'raw');
@@ -81,6 +107,8 @@ const bForUnwrap = (kek: Buffer, A: Buffer, j: number, i: number, n: number, r: 
 };
 
 const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
+  checkWrapInputLengths(key, kek);
+
   const P: Buffer[] = [];
   const R: Buffer[] = [];
   const C: Buffer[] = [];
@@ -119,6 +147,8 @@ const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
 };
 
 const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }): Buffer => {
+  checkUnwrapInputLengths(wrappedKey, kek);
+
   const n = (wrappedKey.length / 8) - 1;
   const C: Buffer[] = [];
   const R: Buffer[] = [];
@@ -144,7 +174,7 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
   }
 
   if (!A.equals(iv)) {
-    throw unauthenticException();
+    throw unauthenticException;
   }
 
   for (let i = 0; i < n; i++) {
@@ -157,4 +187,5 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
 /* eslint-enable no-bitwise */
 /* eslint-enable id-length */
 
-export { aesWrapKey, aesUnwrapKey };
+export { aesWrapKey, aesUnwrapKey, invalidKekLengthException, invalidKeyDataLengthException,
+  invalidWrappedKeyDataLengthException, unauthenticException };

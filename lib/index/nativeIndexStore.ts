@@ -1,8 +1,7 @@
 import { IndexDelta } from './indexDelta';
 import { IndexItem } from './indexItems/indexItem';
-import { IndexStore } from './indexStore';
-import { noSuchIndexItemException } from '../exceptions';
 import reactNativeFs from 'react-native-fs';
+import { IndexStore, noSuchIndexItemException } from './indexStore';
 
 const encoding = 'utf-8';
 
@@ -30,7 +29,7 @@ const nativeIndexStore: IndexStore = {
     const itemString = await reactNativeFs.readFile(path, encoding);
 
     if (!itemString) {
-      throw noSuchIndexItemException({ id });
+      throw noSuchIndexItemException(id);
     }
 
     return JSON.parse(itemString);
@@ -42,7 +41,7 @@ const nativeIndexStore: IndexStore = {
     const itemString = await reactNativeFs.readFile(path, encoding);
 
     if (!itemString) {
-      throw noSuchIndexItemException({ id });
+      throw noSuchIndexItemException(id);
     }
 
     await reactNativeFs.unlink(path);

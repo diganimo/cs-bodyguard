@@ -9,4 +9,6 @@ interface IndexStore {
   deleteAllItems: () => Promise<void>;
 }
 
-export { IndexStore };
+const noSuchIndexItemException = (id: string): Error => new Error(`Index Item with id ${id} does not exist.`);
+
+export { IndexStore, noSuchIndexItemException };

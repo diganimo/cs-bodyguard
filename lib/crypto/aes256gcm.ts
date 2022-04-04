@@ -1,22 +1,17 @@
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
-import { invalidCryptoInputLengthException, tooShortCryptoInputException, unauthenticException } from '../exceptions';
+
+const invalidKeyLengthException = new Error('Invalid Key length. Length must be 32 bytes.');
+const invalidIvLengthException = new Error('Invalid IV length. Length must be at least 12 bytes.');
+const unauthenticException = new Error('HMAC mismatch detected.');
 
 const checkInput = function (key: Buffer, iv: Buffer): void {
   if (key.length !== 32) {
-    const input = 'key';
-    const lengthGiven = key.length;
-    const lengthExpected = 32;
-
-    throw invalidCryptoInputLengthException({ input, lengthGiven, lengthExpected });
+    throw invalidKeyLengthException;
   }
 
   if (iv.length < 12) {
-    const input = 'key';
-    const lengthGiven = iv.length;
-    const lengthAtLeastExpected = 12;
-
-    throw tooShortCryptoInputException({ input, lengthGiven, lengthAtLeastExpected });
+    throw invalidIvLengthException;
   }
 };
 
@@ -70,7 +65,7 @@ const aes256gcmDecrypt = function ({ cipherAndTag, key, iv, associated }: {
   const pass = cipher.finish();
 
   if (!pass) {
-    throw unauthenticException();
+    throw unauthenticException;
   }
 
   const plainHex = cipher.output.toHex();
@@ -78,4 +73,4 @@ const aes256gcmDecrypt = function ({ cipherAndTag, key, iv, associated }: {
   return Buffer.from(plainHex, 'hex');
 };
 
-export { aes256gcmEncrypt, aes256gcmDecrypt };
+export { aes256gcmEncrypt, aes256gcmDecrypt, unauthenticException, invalidKeyLengthException, invalidIvLengthException };

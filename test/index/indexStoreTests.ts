@@ -4,7 +4,7 @@ import { IndexItem } from 'lib/index/indexItems/indexItem';
 import localforage from 'localforage';
 import memoryStorageDriver from 'localforage-memoryStorageDriver';
 import { nativeIndexStore } from '../../lib/index/nativeIndexStore';
-import { noSuchIndexItemException } from '../../lib/exceptions';
+import { noSuchIndexItemException } from '../../lib/index/indexStore';
 import reactNativeFsMock from '../mocks/reactNativeFsMock';
 
 const testItem: IndexItem = {
@@ -205,7 +205,7 @@ for (const resource of storeTestResources) {
         });
 
         assert.that(exception).is.not.null();
-        assert.that(exception.message).is.equalTo(noSuchIndexItemException({ id }).message);
+        assert.that(exception.message).is.equalTo(noSuchIndexItemException(id).message);
       });
 
       test('Throws exception on deleteItem(...), if item with given id does not exist.', async (): Promise<void> => {
@@ -217,7 +217,7 @@ for (const resource of storeTestResources) {
         });
 
         assert.that(exception).is.not.null();
-        assert.that(exception.message).is.equalTo(noSuchIndexItemException({ id }).message);
+        assert.that(exception.message).is.equalTo(noSuchIndexItemException(id).message);
       });
     });
   });
