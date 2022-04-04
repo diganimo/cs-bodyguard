@@ -91,19 +91,15 @@ const calculateA = (B: Buffer, n: number, j: number, i: number): Buffer => {
   return resultBuffer;
 };
 
-const bForUnwrap = (kek: Buffer, A: Buffer, j: number, i: number, n: number, r: Buffer): Buffer => {
-  /* eslint-disable @typescript-eslint/naming-convention */
-
+const calculateB = (kek: Buffer, A: Buffer, j: number, i: number, n: number, r: Buffer): Buffer => {
   const tBigInt = BigInt((n * j) + i);
   const aBigInt = A.readBigUInt64BE(0);
-  const aXorTBigInt = aBigInt ^ tBigInt;
-  const aXorTBuffer = Buffer.allocUnsafe(8);
+  const aXoredBigInt = aBigInt ^ tBigInt;
+  const aXoredBuffer = Buffer.allocUnsafe(8);
 
-  aXorTBuffer.writeBigUInt64BE(aXorTBigInt, 0);
+  aXoredBuffer.writeBigUInt64BE(aXoredBigInt, 0);
 
-  return aesDecrypt(kek, Buffer.concat([ aXorTBuffer, r ]));
-
-  /* eslint-enable @typescript-eslint/naming-convention */
+  return aesDecrypt(kek, Buffer.concat([ aXoredBuffer, r ]));
 };
 
 const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
@@ -148,7 +144,7 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
 
   for (let j = 5; j >= 0; j--) {
     for (let i = n - 1; i >= 0; i--) {
-      const B = bForUnwrap(kek, A, j, i + 1, n, R[i]);
+      const B = calculateB(kek, A, j, i + 1, n, R[i]);
 
       A = msb(8, B);
       R[i] = lsb(8, B);
