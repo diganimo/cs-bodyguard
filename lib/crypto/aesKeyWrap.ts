@@ -109,23 +109,17 @@ const bForUnwrap = (kek: Buffer, A: Buffer, j: number, i: number, n: number, r: 
 const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
   checkWrapInputLengths(key, kek);
 
-  const P: Buffer[] = [];
   const R: Buffer[] = [];
-  const C: Buffer[] = [];
   const n = key.length / 8;
 
   for (let i = 0; i < n; i++) {
-    P[i] = key.slice(8 * i, 8 * (i + 1));
+    R[i] = key.slice(8 * i, 8 * (i + 1));
   }
 
   const aCopy = new Uint8Array(iv.length);
 
   iv.copy(aCopy);
   let A = Buffer.from(aCopy);
-
-  for (let i = 0; i < n; i++) {
-    R[i] = P[i];
-  }
 
   for (let j = 0; j <= 5; j++) {
     for (let i = 0; i < n; i++) {
@@ -137,31 +131,19 @@ const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
     }
   }
 
-  C[0] = A;
-
-  for (let i = 1; i <= n; i++) {
-    C[i] = R[i - 1];
-  }
-
-  return Buffer.concat(C);
+  return Buffer.concat([ A, ...R ]);
 };
 
 const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }): Buffer => {
   checkUnwrapInputLengths(wrappedKey, kek);
 
   const n = (wrappedKey.length / 8) - 1;
-  const C: Buffer[] = [];
   const R: Buffer[] = [];
-  const P: Buffer[] = [];
 
-  for (let i = 0; i <= n; i++) {
-    C.push(wrappedKey.slice(8 * i, 8 * (i + 1)));
-  }
-
-  let A = C[0];
+  let A = wrappedKey.slice(0, 8);
 
   for (let i = 1; i <= n; i++) {
-    R[i - 1] = C[i];
+    R.push(wrappedKey.slice(8 * i, 8 * (i + 1)));
   }
 
   for (let j = 5; j >= 0; j--) {
@@ -177,11 +159,7 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
     throw unauthenticException;
   }
 
-  for (let i = 0; i < n; i++) {
-    P[i] = R[i];
-  }
-
-  return Buffer.concat(P);
+  return Buffer.concat(R);
 };
 
 /* eslint-enable no-bitwise */
