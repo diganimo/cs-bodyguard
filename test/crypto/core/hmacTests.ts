@@ -1,6 +1,6 @@
 import { assert } from 'assertthat';
 import { Buffer } from 'buffer';
-import { createHmac, isValidHmac } from '../../lib/crypto/hmac';
+import { createHmac, isValidHmac } from '../../../lib/crypto/core/hmac';
 
 // We are using test vectors from ietf
 // https://datatracker.ietf.org/doc/html/rfc4231#section-4.1 (first 4 test cases)

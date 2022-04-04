@@ -1,5 +1,5 @@
 import { assert } from 'assertthat';
-import { getRandomBuffer } from '../../lib/crypto/random';
+import { getRandomBuffer } from '../../../lib/crypto/core/random';
 
 const lengthsToTest = [ 12, 32, 42 ];
 

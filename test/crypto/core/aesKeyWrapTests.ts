@@ -1,6 +1,6 @@
 import { assert } from 'assertthat';
 import { Buffer } from 'buffer';
-import { getRandomBuffer } from '../../lib/crypto/random';
+import { getRandomBuffer } from '../../../lib/crypto/core/random';
 import {
   aesUnwrapKey,
   aesWrapKey,
@@ -8,7 +8,7 @@ import {
   invalidKeyDataLengthException,
   invalidWrappedKeyDataLengthException,
   unauthenticException
-} from '../../lib/crypto/aesKeyWrap';
+} from '../../../lib/crypto/core/aesKeyWrap';
 
 // Test vector from https://datatracker.ietf.org/doc/html/rfc3394#section-4.6
 const testVector = {

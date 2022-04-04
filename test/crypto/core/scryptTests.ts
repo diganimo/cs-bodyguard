@@ -1,5 +1,5 @@
 import { assert } from 'assertthat';
-import { createScryptHash } from '../../lib/crypto/scrypt';
+import { createScryptHash } from '../../../lib/crypto/core/scrypt';
 
 // We are using the test vectors provided by scrypt-js (Repository; renamed props, first 3 vectors)
 // https://github.com/ricmoo/scrypt-js/blob/master/test/test-vectors.json

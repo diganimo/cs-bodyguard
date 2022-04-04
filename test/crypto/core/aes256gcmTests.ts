@@ -1,7 +1,7 @@
 import { assert } from 'assertthat';
 import { Buffer } from 'buffer';
-import { getRandomBuffer } from '../../lib/crypto/random';
-import { aes256gcmDecrypt, aes256gcmEncrypt, invalidIvLengthException, invalidKeyLengthException, unauthenticException } from '../../lib/crypto/aes256gcm';
+import { getRandomBuffer } from '../../../lib/crypto/core/random';
+import { aes256gcmDecrypt, aes256gcmEncrypt, invalidIvLengthException, invalidKeyLengthException, unauthenticException } from '../../../lib/crypto/core/aes256gcm';
 
 // We are using test vectors from:
 // https://boringssl.googlesource.com/boringssl/+/2214/crypto/cipher/cipher_test.txt
