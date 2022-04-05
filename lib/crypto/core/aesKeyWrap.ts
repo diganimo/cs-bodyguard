@@ -38,48 +38,12 @@ const checkUnwrapInputLengths = (wrappedKey: Buffer, kek: Buffer): void => {
   checkKekLength(kek);
 };
 
-const aesEncrypt = (key: Buffer, plaintext: Buffer): Buffer => {
-  const keyForgeBuffer = forge.util.createBuffer(key, 'raw');
-  const plainForgeBuffer = forge.util.createBuffer(plaintext, 'raw');
-  const cipher = forge.cipher.createCipher('AES-ECB', keyForgeBuffer);
-
-  cipher.start({});
-  cipher.update(plainForgeBuffer);
-  cipher.finish();
-
-  const encryptedHex = cipher.output.toHex();
-
-  // Drop last 16 byte since this is the padding (padding can't be disabled with node-forge, unfortunately)
-  return Buffer.from(encryptedHex, 'hex').slice(0, -16);
-};
-
-// Restore padding (padding can't be disabled with node-forge, unfortunately)
-const restorePadding = (ciphertextWithoutPadding: Buffer, key: Buffer): Buffer => {
-  const padding = aesEncrypt(key, paddingOf16Byte);
-
-  return Buffer.concat([ ciphertextWithoutPadding, padding ]);
-};
-
-const aesDecrypt = (key: Buffer, ciphertext: Buffer): Buffer => {
-  const ciphertextPadded = restorePadding(ciphertext, key);
-  const keyForgeBuffer = forge.util.createBuffer(key, 'raw');
-  const cipherForgeBuffer = forge.util.createBuffer(ciphertextPadded, 'raw');
-  const cipher = forge.cipher.createDecipher('AES-ECB', keyForgeBuffer);
-
-  cipher.start({});
-  cipher.update(cipherForgeBuffer);
-  cipher.finish();
-
-  const decryptedHex = cipher.output.toHex();
-
-  return Buffer.from(decryptedHex, 'hex');
-};
-
 const split = (input: Buffer): Buffer[] => {
   const output: Buffer[] = [];
+  const partSize = 8;
 
-  for (let i = 0; i < input.length / 8; i++) {
-    output[i] = input.slice(8 * i, 8 * (i + 1));
+  for (let i = 0; i < input.length / partSize; i++) {
+    output[i] = input.slice(partSize * i, partSize * (i + 1));
   }
 
   return output;
@@ -112,6 +76,43 @@ const bigIntToBuffer = (bigInt: bigint): Buffer => {
 
 const writeBigIntToBuffer = (buffer: Buffer, bigInt: bigint): void => {
   buffer.writeBigUInt64BE(bigInt, 0);
+};
+
+const aesEncrypt = (key: Buffer, plaintext: Buffer): Buffer => {
+  const keyForgeBuffer = forge.util.createBuffer(key, 'raw');
+  const plainForgeBuffer = forge.util.createBuffer(plaintext, 'raw');
+  const cipher = forge.cipher.createCipher('AES-ECB', keyForgeBuffer);
+
+  cipher.start({});
+  cipher.update(plainForgeBuffer);
+  cipher.finish();
+
+  const encryptedHex = cipher.output.toHex();
+
+  // Drop last 16 byte since this is the padding (padding can't be disabled with node-forge, unfortunately)
+  return Buffer.from(encryptedHex, 'hex').slice(0, -16);
+};
+
+// Restore padding (padding can't be disabled with node-forge, unfortunately)
+const restorePadding = (ciphertextWithoutPadding: Buffer, key: Buffer): Buffer => {
+  const padding = aesEncrypt(key, paddingOf16Byte);
+
+  return join([ ciphertextWithoutPadding, padding ]);
+};
+
+const aesDecrypt = (key: Buffer, ciphertext: Buffer): Buffer => {
+  const ciphertextPadded = restorePadding(ciphertext, key);
+  const keyForgeBuffer = forge.util.createBuffer(key, 'raw');
+  const cipherForgeBuffer = forge.util.createBuffer(ciphertextPadded, 'raw');
+  const cipher = forge.cipher.createDecipher('AES-ECB', keyForgeBuffer);
+
+  cipher.start({});
+  cipher.update(cipherForgeBuffer);
+  cipher.finish();
+
+  const decryptedHex = cipher.output.toHex();
+
+  return Buffer.from(decryptedHex, 'hex');
 };
 
 const doWrappingTransformation = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number, i: number): void => {
