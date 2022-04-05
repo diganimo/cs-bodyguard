@@ -4,7 +4,6 @@
 // Also tested with random values, checking the formular: key = unwrap(wrap(key, kek), kek)
 
 /* eslint-disable id-length */
-/* eslint-disable no-bitwise */
 
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
@@ -76,80 +75,107 @@ const aesDecrypt = (key: Buffer, ciphertext: Buffer): Buffer => {
   return Buffer.from(decryptedHex, 'hex');
 };
 
-const msb = (countOfBytes: number, buffer: Buffer): Buffer => buffer.slice(0, countOfBytes);
+const split = (input: Buffer): Buffer[] => {
+  const output: Buffer[] = [];
 
-const lsb = (countOfBytes: number, buffer: Buffer): Buffer => buffer.slice(buffer.length - countOfBytes, buffer.length);
+  for (let i = 0; i < input.length / 8; i++) {
+    output[i] = input.slice(8 * i, 8 * (i + 1));
+  }
 
-const calculateA = (B: Buffer, n: number, j: number, i: number): Buffer => {
-  const msbBuffer = msb(8, B);
-
-  const msbBigInt = msbBuffer.readBigUInt64BE(0);
-  const resultBigInt = msbBigInt ^ BigInt((n * j) + i);
-  const resultBuffer = Buffer.allocUnsafe(8);
-
-  resultBuffer.writeBigUInt64BE(resultBigInt, 0);
-
-  return resultBuffer;
+  return output;
 };
 
-const calculateB = (kek: Buffer, A: Buffer, j: number, i: number, n: number, r: Buffer): Buffer => {
-  const tBigInt = BigInt((n * j) + i);
-  const aBigInt = A.readBigUInt64BE(0);
-  const aXoredBigInt = aBigInt ^ tBigInt;
-  const aXoredBuffer = Buffer.allocUnsafe(8);
+const join = (parts: Buffer[]): Buffer => Buffer.concat([ ...parts ]);
 
-  aXoredBuffer.writeBigUInt64BE(aXoredBigInt, 0);
+const copyBuffer = (src: Buffer): Buffer => {
+  const copy = new Uint8Array(src.length);
 
-  return aesDecrypt(kek, Buffer.concat([ aXoredBuffer, r ]));
+  src.copy(copy);
+
+  return Buffer.from(copy);
+};
+
+/* eslint-disable-next-line no-bitwise */
+const xor = (left: bigint, right: bigint): bigint => left ^ right;
+
+const calculateT = (n: number, j: number, i: number): number => (n * j) + i + 1;
+
+const bufferToBigInt = (buffer: Buffer): bigint => buffer.readBigUInt64BE();
+
+const bigIntToBuffer = (bigInt: bigint): Buffer => {
+  const buffer = Buffer.allocUnsafe(8);
+
+  buffer.writeBigUInt64BE(bigInt);
+
+  return buffer;
+};
+
+const writeBigIntToBuffer = (buffer: Buffer, bigInt: bigint): void => {
+  buffer.writeBigUInt64BE(bigInt, 0);
+};
+
+const doWrappingTransformation = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number, i: number): void => {
+  const t = calculateT(n, j, i);
+  const W = join([ A, R[i] ]);
+  const B = aesEncrypt(kek, W);
+  const splitted = split(B);
+  const xored = xor(bufferToBigInt(splitted[0]), BigInt(t));
+
+  writeBigIntToBuffer(A, xored);
+
+  // eslint-disable-next-line no-param-reassign
+  R[i] = splitted[1];
+};
+
+const doWrappingRound = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number): void => {
+  for (let i = 0; i < n; i++) {
+    doWrappingTransformation(A, R, kek, n, j, i);
+  }
+};
+
+const doUnwrappingTransformation = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number, i: number): void => {
+  const t = calculateT(n, j, i);
+  const xored = xor(bufferToBigInt(A), BigInt(t));
+  const B = join([ bigIntToBuffer(xored), R[i] ]);
+  const W = aesDecrypt(kek, B);
+  const splitted = split(W);
+
+  A.write(splitted[0].toString('binary'), 'binary');
+
+  // eslint-disable-next-line no-param-reassign
+  R[i] = splitted[1];
+};
+
+const doUnwrappingRound = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number): void => {
+  for (let i = n - 1; i >= 0; i--) {
+    doUnwrappingTransformation(A, R, kek, n, j, i);
+  }
 };
 
 const aesWrapKey = ({ key, kek }: { key: Buffer; kek: Buffer }): Buffer => {
   checkWrapInputLengths(key, kek);
 
-  const R: Buffer[] = [];
-  const n = key.length / 8;
+  const R = split(key);
+  const n = R.length;
 
-  for (let i = 0; i < n; i++) {
-    R[i] = key.slice(8 * i, 8 * (i + 1));
-  }
-
-  const aCopy = new Uint8Array(iv.length);
-
-  iv.copy(aCopy);
-  let A = Buffer.from(aCopy);
+  const A = copyBuffer(iv);
 
   for (let j = 0; j <= 5; j++) {
-    for (let i = 0; i < n; i++) {
-      const B = aesEncrypt(kek, Buffer.concat([ A, R[i] ]));
-
-      A = calculateA(B, n, j, i + 1);
-
-      R[i] = lsb(8, B);
-    }
+    doWrappingRound(A, R, kek, n, j);
   }
 
-  return Buffer.concat([ A, ...R ]);
+  return join([ A, ...R ]);
 };
 
 const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }): Buffer => {
   checkUnwrapInputLengths(wrappedKey, kek);
 
-  const n = (wrappedKey.length / 8) - 1;
-  const R: Buffer[] = [];
-
-  let A = wrappedKey.slice(0, 8);
-
-  for (let i = 1; i <= n; i++) {
-    R.push(wrappedKey.slice(8 * i, 8 * (i + 1)));
-  }
+  // eslint-disable-next-line prefer-const
+  let [ A, ...R ] = split(wrappedKey);
+  const n = R.length;
 
   for (let j = 5; j >= 0; j--) {
-    for (let i = n - 1; i >= 0; i--) {
-      const B = calculateB(kek, A, j, i + 1, n, R[i]);
-
-      A = msb(8, B);
-      R[i] = lsb(8, B);
-    }
+    doUnwrappingRound(A, R, kek, n, j);
   }
 
   if (!A.equals(iv)) {
@@ -159,7 +185,6 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
   return Buffer.concat(R);
 };
 
-/* eslint-enable no-bitwise */
 /* eslint-enable id-length */
 
 export { aesWrapKey, aesUnwrapKey, invalidKekLengthException, invalidKeyDataLengthException,
