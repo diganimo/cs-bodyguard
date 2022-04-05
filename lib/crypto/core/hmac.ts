@@ -10,10 +10,4 @@ const createHmac = function ({ data, key }: { data: string; key: Buffer }): stri
   return forgeHmac.digest().toHex();
 };
 
-const isValidHmac = function ({ data, key, givenHmac }: { data: string; key: Buffer; givenHmac: string }): boolean {
-  const actualHmac = createHmac({ data, key });
-
-  return actualHmac === givenHmac;
-};
-
-export { createHmac, isValidHmac };
+export { createHmac };

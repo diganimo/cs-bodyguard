@@ -1,6 +1,6 @@
 import { assert } from 'assertthat';
 import { Buffer } from 'buffer';
-import { createHmac, isValidHmac } from '../../../lib/crypto/core/hmac';
+import { createHmac } from '../../../lib/crypto/core/hmac';
 
 // We are using test vectors from ietf
 // https://datatracker.ietf.org/doc/html/rfc4231#section-4.1 (first 4 test cases)
@@ -29,48 +29,14 @@ const testVectors = [
 ];
 
 describe('hmac', (): void => {
-  describe('creation', (): void => {
-    for (const [ vectorIndex, { keyHex, messageHex, expectedHmacHex }] of testVectors.entries()) {
-      test(`Returns real hmac for test case ${vectorIndex + 1}.`, async (): Promise<void> => {
-        const key = Buffer.from(keyHex, 'hex');
-        const data = Buffer.from(messageHex, 'hex').toString('binary');
+  for (const [ vectorIndex, { keyHex, messageHex, expectedHmacHex }] of testVectors.entries()) {
+    test(`Returns real hmac for test case ${vectorIndex + 1}.`, async (): Promise<void> => {
+      const key = Buffer.from(keyHex, 'hex');
+      const data = Buffer.from(messageHex, 'hex').toString('binary');
 
-        const createdHmac = createHmac({ data, key });
+      const createdHmac = createHmac({ data, key });
 
-        assert.that(createdHmac).is.equalTo(expectedHmacHex);
-      });
-    }
-  });
-
-  describe('validation', (): void => {
-    test('Evaluates to true for correct hmac.', async (): Promise<void> => {
-      const data = 'testString';
-      const key = Buffer.from('testKey', 'utf8');
-      const givenHmac = createHmac({ data, key });
-
-      const valid = isValidHmac({ data, key, givenHmac });
-
-      assert.that(valid).is.true();
+      assert.that(createdHmac).is.equalTo(expectedHmacHex);
     });
-
-    test('Evaluates to false for incorrect hmac with valid pattern.', async (): Promise<void> => {
-      const data = 'testString';
-      const key = Buffer.from('testKey', 'utf8');
-      const givenHmac = '7e8cba9dd9f06ebdd7f92e0f1a67c7f4df52693c212bdd84f67370b351533c6c';
-
-      const valid = isValidHmac({ data, key, givenHmac });
-
-      assert.that(valid).is.false();
-    });
-
-    test('Evaluates to false for incorrect hmac with invalid pattern w/o exception.', async (): Promise<void> => {
-      const data = 'testString';
-      const key = Buffer.from('testKey', 'utf8');
-      const givenHmac = 'invalidPattern';
-
-      const valid = isValidHmac({ data, key, givenHmac });
-
-      assert.that(valid).is.false();
-    });
-  });
+  }
 });
