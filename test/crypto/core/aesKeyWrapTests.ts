@@ -116,8 +116,8 @@ describe('AES-KEY-Wrap', (): void => {
       assert.that(exception?.message).is.equalTo(unauthenticException.message);
     });
 
-    test('throws invalidKeyDataLengthException if keyData is too short.', async (): Promise<void> => {
-      const key = await getRandomBuffer({ length: 8 });
+    test('throws invalidKeyDataLengthException if keyData length is not 32 bytes.', async (): Promise<void> => {
+      const key = await getRandomBuffer({ length: 31 });
       const kek = await getRandomBuffer({ length: 32 });
       let exception: Error | null = null;
 
@@ -131,38 +131,8 @@ describe('AES-KEY-Wrap', (): void => {
       assert.that(exception?.message).is.equalTo(invalidKeyDataLengthException.message);
     });
 
-    test('throws invalidKeyDataLengthException if keyData length is not multiple of 8.', async (): Promise<void> => {
-      const key = await getRandomBuffer({ length: 20 });
-      const kek = await getRandomBuffer({ length: 32 });
-      let exception: Error | null = null;
-
-      try {
-        aesWrapKey({ key, kek });
-      } catch (ex: unknown) {
-        exception = ex as Error;
-      }
-
-      assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidKeyDataLengthException.message);
-    });
-
-    test('throws invalidWrappedKeyDataLengthException if wrapped keyData is too short.', async (): Promise<void> => {
-      const wrappedKey = await getRandomBuffer({ length: 16 });
-      const kek = await getRandomBuffer({ length: 32 });
-      let exception: Error | null = null;
-
-      try {
-        aesUnwrapKey({ wrappedKey, kek });
-      } catch (ex: unknown) {
-        exception = ex as Error;
-      }
-
-      assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidWrappedKeyDataLengthException.message);
-    });
-
-    test('throws invalidWrappedKeyDataLengthException if wrapped keyData length is not multiple of 8.', async (): Promise<void> => {
-      const wrappedKey = await getRandomBuffer({ length: 30 });
+    test('throws invalidWrappedKeyDataLengthException if wrapped keyData length is not 40.', async (): Promise<void> => {
+      const wrappedKey = await getRandomBuffer({ length: 38 });
       const kek = await getRandomBuffer({ length: 32 });
       let exception: Error | null = null;
 
@@ -192,7 +162,7 @@ describe('AES-KEY-Wrap', (): void => {
     });
 
     test('throws invalidKekLengthException on unwrapping if kek length is not 32.', async (): Promise<void> => {
-      const wrappedKey = await getRandomBuffer({ length: 32 });
+      const wrappedKey = await getRandomBuffer({ length: 40 });
       const kek = await getRandomBuffer({ length: 33 });
       let exception: Error | null = null;
 

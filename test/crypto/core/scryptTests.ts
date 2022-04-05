@@ -35,32 +35,32 @@ const testVectors = [
 
 const lengthMapping = [
   {
-    givenLength: 9,
-    resultingLength: 9
+    givenLength: 33,
+    resultingLength: 33
   },
   {
-    givenLength: 8,
-    resultingLength: 8
+    givenLength: 32,
+    resultingLength: 32
   },
   {
-    givenLength: 7,
-    resultingLength: 8
+    givenLength: 31,
+    resultingLength: 32
   },
   {
     givenLength: 1,
-    resultingLength: 8
+    resultingLength: 32
   },
   {
     givenLength: 0,
-    resultingLength: 8
+    resultingLength: 32
   },
   {
     givenLength: -1,
-    resultingLength: 8
+    resultingLength: 32
   },
   {
-    givenLength: -9,
-    resultingLength: 8
+    givenLength: -33,
+    resultingLength: 32
   }
 ];
 

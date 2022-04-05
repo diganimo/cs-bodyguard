@@ -1,4 +1,4 @@
-// Implemented, following this specification: https://www.heise.de/netze/rfc/rfcs/rfc3394.shtml,
+// Implemented, following this specification: https://www.heise.de/netze/rfc/rfcs/rfc3394.shtml (index approach),
 // originated by http://csrc.nist.gov/encryption/kms/key-wrap.pdf
 // Testet, using this test vector: https://datatracker.ietf.org/doc/html/rfc3394#section-4.6
 // Also tested with random values, checking the formular: key = unwrap(wrap(key, kek), kek)
@@ -9,9 +9,9 @@
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
 
-const invalidKeyDataLengthException = new Error('Invalid KeyData length. Length must be multiple of and at least 16 byte.');
-const invalidWrappedKeyDataLengthException = new Error('Invalid wrapped KeyData length. Length must be multiple of and at least 24 byte.');
-const invalidKekLengthException = new Error('Invalid kek length. Length must be 32 byte.');
+const invalidKeyDataLengthException = new Error('Invalid KeyData length. Length in byte must be 32.');
+const invalidWrappedKeyDataLengthException = new Error('Invalid wrapped KeyData length. Length in byte must be 40.');
+const invalidKekLengthException = new Error('Invalid kek length. Length in byte must be 32.');
 const unauthenticException = new Error('Inregrity check failed. Wrong kek?');
 
 const iv = Buffer.from('A6A6A6A6A6A6A6A6', 'hex');
@@ -24,7 +24,7 @@ const checkKekLength = (kek: Buffer): void => {
 };
 
 const checkWrapInputLengths = (key: Buffer, kek: Buffer): void => {
-  if ((key.length % 8) > 0 || key.length < 16) {
+  if (key.length !== 32) {
     throw invalidKeyDataLengthException;
   }
 
@@ -32,7 +32,7 @@ const checkWrapInputLengths = (key: Buffer, kek: Buffer): void => {
 };
 
 const checkUnwrapInputLengths = (wrappedKey: Buffer, kek: Buffer): void => {
-  if ((wrappedKey.length % 8) > 0 || wrappedKey.length < 24) {
+  if (wrappedKey.length !== 40) {
     throw invalidWrappedKeyDataLengthException;
   }
 

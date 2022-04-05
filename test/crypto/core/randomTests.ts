@@ -14,7 +14,7 @@ describe('Random', (): void => {
     }
   });
 
-  describe('error cases', (): void => {
+  describe('edge cases', (): void => {
     test('returns one byte buffer on given length 0.', async (): Promise<void> => {
       const length = 0;
       const bytes = await getRandomBuffer({ length });

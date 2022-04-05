@@ -1,8 +1,8 @@
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
 
-const invalidKeyLengthException = new Error('Invalid Key length. Length must be 32 bytes.');
-const invalidIvLengthException = new Error('Invalid IV length. Length must be at least 12 bytes.');
+const invalidKeyLengthException = new Error('Invalid Key length. Length in byte must be 32.');
+const invalidIvLengthException = new Error('Invalid IV length. Length in byte must be 12.');
 const unauthenticException = new Error('HMAC mismatch detected.');
 
 const checkInput = function (key: Buffer, iv: Buffer): void {
@@ -10,7 +10,7 @@ const checkInput = function (key: Buffer, iv: Buffer): void {
     throw invalidKeyLengthException;
   }
 
-  if (iv.length < 12) {
+  if (iv.length !== 12) {
     throw invalidIvLengthException;
   }
 };

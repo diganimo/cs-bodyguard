@@ -10,7 +10,7 @@ const createScryptHash = async function ({ data, salt, cpuFactor, memoryFactor, 
   parallism: number;
   keyLength: number;
 }): Promise<Buffer> {
-  const sanitizedKeyLength = keyLength > 8 ? keyLength : 8;
+  const sanitizedKeyLength = keyLength > 32 ? keyLength : 32;
   const key = await scrypt(data, salt, cpuFactor, memoryFactor, parallism, sanitizedKeyLength, (): void => {
     // NO OP
   });
