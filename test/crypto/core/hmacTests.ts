@@ -36,7 +36,7 @@ describe('hmac', (): void => {
 
       const createdHmac = createHmac({ data, key });
 
-      assert.that(createdHmac).is.equalTo(expectedHmacHex);
+      assert.that(createdHmac).is.equalTo(Buffer.from(expectedHmacHex, 'hex').toString('base64'));
     });
   }
 });

@@ -7,7 +7,9 @@ const createHmac = function ({ data, key }: { data: string; key: Buffer }): stri
   forgeHmac.start('sha256', key.toString('binary'));
   forgeHmac.update(data);
 
-  return forgeHmac.digest().toHex();
+  const hmacHex = forgeHmac.digest().toHex();
+
+  return Buffer.from(hmacHex, 'hex').toString('base64');
 };
 
 export { createHmac };
