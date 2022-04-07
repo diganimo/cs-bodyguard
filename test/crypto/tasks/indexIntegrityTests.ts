@@ -31,7 +31,7 @@ describe('Index Item Integrity', (): void => {
       hmac: 'oldHmac',
       timestamp: 42
     };
-    let exception: Error | null = null;
+    let exception = new Error('function did not throw an exception!');
 
     updateIndexItemHmac({ indexItem, key });
     indexItem.hmac = 'invalid';
@@ -43,7 +43,7 @@ describe('Index Item Integrity', (): void => {
     }
 
     assert.that(exception).is.not.null();
-    assert.that(exception?.message).is.equalTo(unauthenticException(indexItem.id).message);
+    assert.that(exception.message).is.equalTo(unauthenticException(indexItem.id).message);
   });
 
   test('throws no exception if hmac is valid.', async (): Promise<void> => {
@@ -53,7 +53,7 @@ describe('Index Item Integrity', (): void => {
       hmac: 'oldHmac',
       timestamp: 42
     };
-    let exception: Error | null = null;
+    let exception = new Error('function did not throw an exception!');
 
     updateIndexItemHmac({ indexItem, key });
 

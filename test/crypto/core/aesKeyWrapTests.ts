@@ -63,7 +63,7 @@ describe('AES-KEY-Wrap', (): void => {
       const key = await getRandomBuffer({ length: 32 });
       const kek = await getRandomBuffer({ length: 32 });
       const wrappedKey = aesWrapKey({ key, kek });
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       // This tampers with the first byte of the kek
       kek[0] = kek[0] === 0 ? 1 : 0;
@@ -75,7 +75,7 @@ describe('AES-KEY-Wrap', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(unauthenticException.message);
+      assert.that(exception.message).is.equalTo(unauthenticException.message);
     });
 
     test('throws unauthenticException if wrapped key is invalid at the beginning (invalid tag).', async (): Promise<void> => {
@@ -101,7 +101,7 @@ describe('AES-KEY-Wrap', (): void => {
       const key = await getRandomBuffer({ length: 32 });
       const kek = await getRandomBuffer({ length: 32 });
       const wrappedKey = aesWrapKey({ key, kek });
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       // This tampers with the last byte of the wrappedKey
       wrappedKey[39] = wrappedKey[39] === 0 ? 1 : 0;
@@ -113,7 +113,7 @@ describe('AES-KEY-Wrap', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(unauthenticException.message);
+      assert.that(exception.message).is.equalTo(unauthenticException.message);
     });
 
     test('throws invalidKeyDataLengthException if keyData length is not 32 bytes.', async (): Promise<void> => {
@@ -134,7 +134,7 @@ describe('AES-KEY-Wrap', (): void => {
     test('throws invalidWrappedKeyDataLengthException if wrapped keyData length is not 40.', async (): Promise<void> => {
       const wrappedKey = await getRandomBuffer({ length: 38 });
       const kek = await getRandomBuffer({ length: 32 });
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aesUnwrapKey({ wrappedKey, kek });
@@ -143,13 +143,13 @@ describe('AES-KEY-Wrap', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidWrappedKeyDataLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidWrappedKeyDataLengthException.message);
     });
 
     test('throws invalidKekLengthException on wrapping if kek length is not 32.', async (): Promise<void> => {
       const key = await getRandomBuffer({ length: 32 });
       const kek = await getRandomBuffer({ length: 31 });
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aesWrapKey({ key, kek });
@@ -158,13 +158,13 @@ describe('AES-KEY-Wrap', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidKekLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidKekLengthException.message);
     });
 
     test('throws invalidKekLengthException on unwrapping if kek length is not 32.', async (): Promise<void> => {
       const wrappedKey = await getRandomBuffer({ length: 40 });
       const kek = await getRandomBuffer({ length: 33 });
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aesUnwrapKey({ wrappedKey, kek });
@@ -173,7 +173,7 @@ describe('AES-KEY-Wrap', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidKekLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidKekLengthException.message);
     });
   });
 });

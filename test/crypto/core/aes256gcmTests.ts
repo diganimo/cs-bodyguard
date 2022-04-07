@@ -67,7 +67,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       const cipherAndTag = aes256gcmEncrypt({ plain, key, iv, associated });
 
@@ -81,7 +81,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(unauthenticException.message);
+      assert.that(exception.message).is.equalTo(unauthenticException.message);
     });
 
     test('throws unauthentic exception if ciphertext was tempered with.', async (): Promise<void> => {
@@ -90,7 +90,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       const cipherAndTag = aes256gcmEncrypt({ plain, key, iv, associated });
 
@@ -104,7 +104,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(unauthenticException.message);
+      assert.that(exception.message).is.equalTo(unauthenticException.message);
     });
 
     test('throws invalidKeyLength exception on encryption with invalid key length.', async (): Promise<void> => {
@@ -117,7 +117,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aes256gcmEncrypt({ plain, key, iv, associated });
@@ -126,7 +126,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidKeyLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidKeyLengthException.message);
     });
 
     test('throws invalidIvLength exception on encryption with invalid iv length.', async (): Promise<void> => {
@@ -139,7 +139,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aes256gcmEncrypt({ plain, key, iv, associated });
@@ -148,7 +148,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidIvLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidIvLengthException.message);
     });
 
     test('throws invalidKeyLength exception on decryption with invalid key length.', async (): Promise<void> => {
@@ -161,7 +161,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aes256gcmDecrypt({ cipherAndTag, key, iv, associated });
@@ -170,7 +170,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidKeyLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidKeyLengthException.message);
     });
 
     test('throws invalidCryptoInput exception on decryption with invalid iv length.', async (): Promise<void> => {
@@ -183,7 +183,7 @@ describe('AES-GCM-256', (): void => {
       const key = Buffer.from(keyHex, 'hex');
       const iv = Buffer.from(ivHex, 'hex');
       const associated = Buffer.from(associatedHex, 'hex');
-      let exception: Error | null = null;
+      let exception = new Error('function did not throw an exception!');
 
       try {
         aes256gcmDecrypt({ cipherAndTag, key, iv, associated });
@@ -192,7 +192,7 @@ describe('AES-GCM-256', (): void => {
       }
 
       assert.that(exception).is.not.null();
-      assert.that(exception?.message).is.equalTo(invalidIvLengthException.message);
+      assert.that(exception.message).is.equalTo(invalidIvLengthException.message);
     });
   });
 });
