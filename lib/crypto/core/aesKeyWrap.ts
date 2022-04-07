@@ -1,3 +1,6 @@
+// Self implemented, because we didn't find any existing implementation,
+// except for crypto.subtle.wrapKey and crypto.subtle.unwrapKey, not suitable for us,
+// since we can't use crypto.subtle in both environments, browser and native without way more dev complexity.
 // Implemented, following this specification: https://www.heise.de/netze/rfc/rfcs/rfc3394.shtml (index approach),
 // originated by http://csrc.nist.gov/encryption/kms/key-wrap.pdf
 // Testet, using this test vector: https://datatracker.ietf.org/doc/html/rfc3394#section-4.6
