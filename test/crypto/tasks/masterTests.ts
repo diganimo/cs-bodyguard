@@ -45,7 +45,7 @@ describe('Crypto Master', (): void => {
 
       assert.that(wrappedMasterEncryptionKeyBefore).is.not.equalTo(wrappedMasterEncryptionKeyAfter);
       assert.that(wrappedMasterHmacKeyBefore).is.not.equalTo(wrappedMasterHmacKeyAfter);
-    });
+    }, 7_500);
 
     test('returns key ring on getKeyRing.', async (): Promise<void> => {
       const password = 'testPassword';
