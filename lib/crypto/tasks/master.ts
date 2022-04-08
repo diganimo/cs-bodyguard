@@ -15,7 +15,7 @@ const cipherParams = {
   kekLength: 32,
   cpuFactor: 32_768,
   memoryFactor: 8,
-  parallism: 1,
+  parallelism: 1,
   cipherSuite: 'scrypt-aeskeywrap256-aesgcm256-hmacsha256'
 };
 
@@ -40,12 +40,12 @@ const rewrapKey = (oldKek: Buffer, newKek: Buffer, masterItem: MasterItem): Buff
 };
 
 const init = async ({ password }: { password: string }): Promise<MasterItem> => {
-  const { cpuFactor, memoryFactor, parallism, kekLength, cipherSuite } = cipherParams;
+  const { cpuFactor, memoryFactor, parallelism, kekLength, cipherSuite } = cipherParams;
   const salt = await getRandomBuffer({ length: 32 });
   const masterEncryptionKey = await getRandomBuffer({ length: 32 });
   const masterHmacKey = await getRandomBuffer({ length: 32 });
   const data = Buffer.from(password, 'utf8');
-  const kek = await createScryptHash({ data, salt, cpuFactor, memoryFactor, parallism, keyLength: kekLength });
+  const kek = await createScryptHash({ data, salt, cpuFactor, memoryFactor, parallelism, keyLength: kekLength });
   const wrappedMasterEncryptionKey = aesWrapKey({ key: masterEncryptionKey, kek });
   const wrappedMasterHmacKey = aesWrapKey({ key: masterHmacKey, kek });
   const masterItem: MasterItem = {
@@ -55,7 +55,7 @@ const init = async ({ password }: { password: string }): Promise<MasterItem> => 
     salt: salt.toString('base64'),
     cpuFactor,
     memoryFactor,
-    parallism,
+    parallelism,
     wrappedMasterEncryptionKey: wrappedMasterEncryptionKey.toString('base64'),
     wrappedMasterHmacKey: wrappedMasterHmacKey.toString('base64'),
     cipherSuite
@@ -68,13 +68,13 @@ const init = async ({ password }: { password: string }): Promise<MasterItem> => 
 
 const changePassword = async ({ oldPassword, newPassword, masterItem }: {
   oldPassword: string; newPassword: string; masterItem: MasterItem; }): Promise<void> => {
-  const { cpuFactor, memoryFactor, parallism, kekLength } = cipherParams;
+  const { cpuFactor, memoryFactor, parallelism, kekLength } = cipherParams;
   const salt = Buffer.from(masterItem.salt, 'base64');
   const oldPasswordBuffer = Buffer.from(oldPassword, 'utf8');
   const newPasswordBuffer = Buffer.from(newPassword, 'utf8');
 
-  const oldKek = await createScryptHash({ data: oldPasswordBuffer, salt, cpuFactor, memoryFactor, parallism, keyLength: kekLength });
-  const newKek = await createScryptHash({ data: newPasswordBuffer, salt, cpuFactor, memoryFactor, parallism, keyLength: kekLength });
+  const oldKek = await createScryptHash({ data: oldPasswordBuffer, salt, cpuFactor, memoryFactor, parallelism, keyLength: kekLength });
+  const newKek = await createScryptHash({ data: newPasswordBuffer, salt, cpuFactor, memoryFactor, parallelism, keyLength: kekLength });
 
   try {
     const masterHmacKey = rewrapKey(oldKek, newKek, masterItem);
@@ -86,10 +86,10 @@ const changePassword = async ({ oldPassword, newPassword, masterItem }: {
 };
 
 const getKeyRing = async ({ password, masterItem }: { password: string; masterItem: MasterItem }): Promise<KeyRing> => {
-  const { cpuFactor, memoryFactor, parallism, kekLength } = cipherParams;
+  const { cpuFactor, memoryFactor, parallelism, kekLength } = cipherParams;
   const salt = Buffer.from(masterItem.salt, 'base64');
   const data = Buffer.from(password, 'utf8');
-  const kek = await createScryptHash({ data, salt, cpuFactor, memoryFactor, parallism, keyLength: kekLength });
+  const kek = await createScryptHash({ data, salt, cpuFactor, memoryFactor, parallelism, keyLength: kekLength });
   const wrappedMasterEncryptionKey = Buffer.from(masterItem.wrappedMasterEncryptionKey, 'base64');
   const wrappedMasterHmacKey = Buffer.from(masterItem.wrappedMasterHmacKey, 'base64');
 

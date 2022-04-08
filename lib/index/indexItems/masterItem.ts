@@ -4,7 +4,7 @@ interface MasterItem extends IndexItem {
   salt: string;
   cpuFactor: number;
   memoryFactor: number;
-  parallism: number;
+  parallelism: number;
   wrappedMasterEncryptionKey: string;
   wrappedMasterHmacKey: string;
   cipherSuite: string;

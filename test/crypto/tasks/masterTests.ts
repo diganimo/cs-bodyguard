@@ -14,7 +14,7 @@ describe('Crypto Master', (): void => {
       const masterItem = await init({ password });
 
       const { id, hmac, timestamp, salt, wrappedMasterEncryptionKey,
-        wrappedMasterHmacKey, cpuFactor, memoryFactor, parallism, cipherSuite } = masterItem;
+        wrappedMasterHmacKey, cpuFactor, memoryFactor, parallelism, cipherSuite } = masterItem;
 
       assert.that(id).is.equalTo('master');
       assert.that(base64For32ByteRegex.test(hmac)).is.true();
@@ -25,7 +25,7 @@ describe('Crypto Master', (): void => {
       assert.that(base64For40ByteRegex.test(wrappedMasterHmacKey)).is.true();
       assert.that(cpuFactor).is.equalTo(cipherParams.cpuFactor);
       assert.that(memoryFactor).is.equalTo(cipherParams.memoryFactor);
-      assert.that(parallism).is.equalTo(cipherParams.parallism);
+      assert.that(parallelism).is.equalTo(cipherParams.parallelism);
       assert.that(cipherSuite).is.equalTo(cipherParams.cipherSuite);
     });
 
@@ -50,13 +50,13 @@ describe('Crypto Master', (): void => {
     test('returns key ring on getKeyRing.', async (): Promise<void> => {
       const password = 'testPassword';
       const masterItem = await init({ password });
-      const { wrappedMasterEncryptionKey, wrappedMasterHmacKey, salt, cpuFactor, memoryFactor, parallism } = masterItem;
+      const { wrappedMasterEncryptionKey, wrappedMasterHmacKey, salt, cpuFactor, memoryFactor, parallelism } = masterItem;
       const kek = await createScryptHash({
         data: Buffer.from(password, 'utf8'),
         salt: Buffer.from(salt, 'base64'),
         cpuFactor,
         memoryFactor,
-        parallism,
+        parallelism,
         keyLength: cipherParams.kekLength
       });
 
