@@ -95,7 +95,7 @@ describe('AES-GCM-256', (): void => {
       const cipherAndTag = aes256gcmEncrypt({ plain, key, iv, associated });
 
       // This tampers with the ciphertext.
-      cipherAndTag[50] = cipherAndTag[12] === 0 ? 1 : 0;
+      cipherAndTag[12] = cipherAndTag[12] === 0 ? 1 : 0;
 
       try {
         aes256gcmDecrypt({ cipherAndTag, key, iv, associated });

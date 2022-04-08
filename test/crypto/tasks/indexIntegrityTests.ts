@@ -53,7 +53,7 @@ describe('Index Item Integrity', (): void => {
       hmac: 'oldHmac',
       timestamp: 42
     };
-    let exception = new Error('function did not throw an exception!');
+    let exception: null | Error = null;
 
     updateIndexItemHmac({ indexItem, key });
 
