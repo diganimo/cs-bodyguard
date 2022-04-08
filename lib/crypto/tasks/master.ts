@@ -16,7 +16,7 @@ const cipherParams = {
   cpuFactor: 32_768,
   memoryFactor: 8,
   parallism: 1,
-  cipherSuite: 'scrypt-aeskeywrap256-aesgcm256-hmac'
+  cipherSuite: 'scrypt-aeskeywrap256-aesgcm256-hmacsha256'
 };
 
 const getExceptionToThrow = (error: Error): Error => error.message === unauthenticException.message ? invalidPasswordException : error;
