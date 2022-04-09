@@ -79,6 +79,9 @@ const changePassword = async ({ oldPassword, newPassword, masterItem }: {
   try {
     const masterHmacKey = rewrapKey(oldKek, newKek, masterItem);
 
+    // eslint-disable-next-line no-param-reassign
+    masterItem.timestamp = Date.now();
+
     updateIndexItemHmac({ indexItem: masterItem, key: masterHmacKey });
   } catch (ex: unknown) {
     throw getExceptionToThrow(ex as Error);

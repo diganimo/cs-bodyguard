@@ -5,12 +5,13 @@ const forgeRandom = async function (length: number): Promise<string> {
   return new Promise((resolve, reject): void => {
     const sanitizedLength = length > 0 ? length : 1;
 
-    forge.random.getBytes(sanitizedLength, (err, bytes): void => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(bytes);
-    });
+    try {
+      // Sync method is ok here, because we are wrapping it with promise
+      // eslint-disable-next-line no-sync
+      resolve(forge.random.getBytesSync(sanitizedLength));
+    } catch (ex: unknown) {
+      reject(ex);
+    }
   });
 };
 
