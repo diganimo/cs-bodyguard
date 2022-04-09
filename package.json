@@ -30,6 +30,7 @@
   },
   "scripts": {
     "build": "npx roboter build",
+    "postinstall": "echo '' > ./node_modules/@types/mocha/index.d.ts",
     "qa": "npx roboter analyze && npx roboter deps && echo '' && echo ▸ Running tests via jest... && jest",
     "test": "jest"
   },

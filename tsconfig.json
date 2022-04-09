@@ -9,8 +9,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "target": "es2019",
-    "noImplicitAny": false,
-    "skipLibCheck": true
+    "noImplicitAny": false
   },
   "include": [
     "./**/*.ts"
