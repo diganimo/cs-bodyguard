@@ -1,6 +1,13 @@
 import { assert } from 'assertthat';
 import forge from 'node-forge';
 import { changePassword, cipherParams, getKeyRing, init, invalidPasswordException } from '../../../lib/crypto/tasks/master';
+import * as scrypt from '../../../lib/crypto/core/scrypt';
+
+/* eslint-disable no-undef */
+const randomMock = jest.spyOn(forge.random, 'getBytesSync');
+const scryptMock = jest.spyOn(scrypt, 'createScryptHash');
+const timeMock = jest.spyOn(Date, 'now');
+/* eslint-enable no-undef */
 
 // Derived from previously dynamic tests before they got refactored to be static
 const expectedWrappedMasterEncryptionKey = 'k3kvNbWTnVgk/iqK3u6G6OeOuWcOaKgW6ycCGCsk72OJ6TqOfsGVAQ==';
@@ -9,6 +16,11 @@ const expectedHmac = 'sdqBiAb8YAl4n5VmFDpzeewEWXqlZfJXdn1pIbZqDvQ=';
 const expectedModifiedWrappedMasterEncryptionKey = 'SR6mRjs1W3n7fjkMPe9GT+fqszhTk2IBeOetp2Ty6opQ0NG8ALiihw==';
 const expectedModifiedWrappedMasterHmacKey = 'CRPd6Zkw8lYlhlbwswdUSviCx8aD/BKozOIALTRTZJo3i/67Ilub2A==';
 const expectedModifiedHmac = 'KeNs6/goloEeW38MzHtW2ZwXtwkRacDr65NeJ3You88=';
+const mockedKekStrings = {
+  initialPasswordKek: 'E+BGZoPGUitqFtqizMPcCXxOmZUDZJlffLG/cAop6zo=',
+  invalidPasswordKek: 'dKAwKuxGgaqxiB0ZtibVtjDKMgwBkrFFDmiojy+85I4=',
+  newPasswordKek: 'umN/8jNd0jId1zcOtE2RvX8MI4TBZlQFTnzXdi9wXO4='
+};
 
 const mockedTimestamp = 42;
 const mockedModifiedTimestamp = 242;
@@ -18,11 +30,6 @@ const mockedRandomStrings = {
   encKey: 'encKey-encKey-encKey-encKey.....',
   macKey: 'macKey-macKey-macKey-macKey.....'
 };
-
-// eslint-disable-next-line no-undef
-const randomMock = jest.spyOn(forge.random, 'getBytesSync');
-// eslint-disable-next-line no-undef
-const timeMock = jest.spyOn(Date, 'now');
 
 const initialMasterItem = {
   id: 'master',
@@ -43,6 +50,7 @@ describe('Crypto Master', (): void => {
       randomMock.mockReturnValueOnce(mockedRandomStrings.salt);
       randomMock.mockReturnValueOnce(mockedRandomStrings.encKey);
       randomMock.mockReturnValueOnce(mockedRandomStrings.macKey);
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.initialPasswordKek, 'base64'));
       timeMock.mockReturnValueOnce(mockedTimestamp);
 
       const password = 'testPassword';
@@ -66,6 +74,8 @@ describe('Crypto Master', (): void => {
 
     test('updates master item on changePassword.', async (): Promise<void> => {
       timeMock.mockReturnValueOnce(mockedModifiedTimestamp);
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.initialPasswordKek, 'base64'));
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.newPasswordKek, 'base64'));
 
       const oldPassword = 'testPassword';
       const newPassword = 'newTestPassword';
@@ -80,6 +90,7 @@ describe('Crypto Master', (): void => {
     }, 7_500);
 
     test('returns key ring on getKeyRing.', async (): Promise<void> => {
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.initialPasswordKek, 'base64'));
       const password = 'testPassword';
       const masterItem = { ...initialMasterItem };
 
@@ -93,6 +104,8 @@ describe('Crypto Master', (): void => {
 
   describe('error cases', (): void => {
     test('throws invalidPassword Exception on changePassword.', async (): Promise<void> => {
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.invalidPasswordKek, 'base64'));
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.newPasswordKek, 'base64'));
       const oldPassword = 'invalid';
       const newPassword = 'newTestPassword';
       const masterItem = { ...initialMasterItem };
@@ -107,6 +120,7 @@ describe('Crypto Master', (): void => {
     });
 
     test('throws invalidPassword Exception on getKeyRing.', async (): Promise<void> => {
+      scryptMock.mockResolvedValueOnce(Buffer.from(mockedKekStrings.invalidPasswordKek, 'base64'));
       const password = 'invalid';
       const masterItem = { ...initialMasterItem };
       let exception = new Error('function did not throw an exception!');
