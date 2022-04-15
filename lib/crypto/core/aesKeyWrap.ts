@@ -11,22 +11,25 @@
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
 
+const keyKekLength = 32;
+const wrappedKeyLength = keyKekLength + 8;
+
 const invalidKeyDataLengthException = new Error('Invalid KeyData length. Length in byte must be 32.');
 const invalidWrappedKeyDataLengthException = new Error('Invalid wrapped KeyData length. Length in byte must be 40.');
 const invalidKekLengthException = new Error('Invalid kek length. Length in byte must be 32.');
 const unauthenticException = new Error('Inregrity check failed. Wrong kek?');
 
-const iv = Buffer.from('A6A6A6A6A6A6A6A6', 'hex');
-const paddingOf16Byte = Buffer.from('10101010101010101010101010101010', 'hex');
+const iv = Buffer.from('A6'.repeat(8), 'hex');
+const paddingOf16Byte = Buffer.from('10'.repeat(16), 'hex');
 
 const checkKekLength = (kek: Buffer): void => {
-  if (kek.length !== 32) {
+  if (kek.length !== keyKekLength) {
     throw invalidKekLengthException;
   }
 };
 
 const checkWrapInputLengths = (key: Buffer, kek: Buffer): void => {
-  if (key.length !== 32) {
+  if (key.length !== keyKekLength) {
     throw invalidKeyDataLengthException;
   }
 
@@ -34,7 +37,7 @@ const checkWrapInputLengths = (key: Buffer, kek: Buffer): void => {
 };
 
 const checkUnwrapInputLengths = (wrappedKey: Buffer, kek: Buffer): void => {
-  if (wrappedKey.length !== 40) {
+  if (wrappedKey.length !== wrappedKeyLength) {
     throw invalidWrappedKeyDataLengthException;
   }
 
