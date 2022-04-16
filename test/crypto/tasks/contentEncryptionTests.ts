@@ -2,7 +2,7 @@ import { assert } from 'assertthat';
 import { Buffer } from 'buffer';
 import forge from 'node-forge';
 import { getRandomBuffer } from '../../../lib/crypto/core/random';
-import { chunkSize, decryptContent, encryptContent, unauthenticChunkException, unauthenticHeaderException }
+import { chunkSize, decrypt, encrypt, unauthenticChunkException, unauthenticHeaderException }
   from '../../../lib/crypto/tasks/contentEncryption';
 
 const mockedRandomStrings = {
@@ -81,7 +81,7 @@ describe('Content Encryption', (): void => {
       randomMock.mockReturnValueOnce(mockedRandomStrings.contentKey);
       randomMock.mockReturnValueOnce(mockedRandomStrings.chunk1Nonce);
 
-      const encryptedContent = await encryptContent({ content: Buffer.from(plaintexts.tenChars, 'utf8'), masterKey, contentId: 'plain1' });
+      const encryptedContent = await encrypt({ content: Buffer.from(plaintexts.tenChars, 'utf8'), masterKey, contentId: 'plain1' });
 
       assert.that(encryptedContent).is.equalTo(Buffer.from(ecpectedEncryptedContentForTenCharsPlaintext, 'base64'));
     });
@@ -94,7 +94,7 @@ describe('Content Encryption', (): void => {
       randomMock.mockReturnValueOnce(mockedRandomStrings.chunk3Nonce);
 
       const encryptedContent =
-        await encryptContent({ content: Buffer.from(plaintexts.sixKiloBytes, 'utf8'), masterKey, contentId: 'plain2' });
+        await encrypt({ content: Buffer.from(plaintexts.sixKiloBytes, 'utf8'), masterKey, contentId: 'plain2' });
 
       assert.that(encryptedContent.length).is.equalTo(10_384);
       assert.that(encryptedContent.slice(0, 12)).is.equalTo(Buffer.from(mockedRandomStrings.headerNonce, 'binary'));
@@ -110,14 +110,14 @@ describe('Content Encryption', (): void => {
       randomMock.mockReturnValueOnce(mockedRandomStrings.chunk1Nonce);
 
       const encryptedContent =
-        await encryptContent({ content: Buffer.from(plaintexts.empty, 'utf8'), masterKey, contentId: 'plain3' });
+        await encrypt({ content: Buffer.from(plaintexts.empty, 'utf8'), masterKey, contentId: 'plain3' });
 
       assert.that(encryptedContent.length).is.equalTo(60);
     });
 
     test('decrypts ciphertext of tenChars plaintext.', async (): Promise<void> => {
       const decrypted =
-        decryptContent({ encryptedContent: Buffer.from(ecpectedEncryptedContentForTenCharsPlaintext, 'base64'), masterKey, contentId: 'plain1' });
+        decrypt({ encryptedContent: Buffer.from(ecpectedEncryptedContentForTenCharsPlaintext, 'base64'), masterKey, contentId: 'plain1' });
 
       assert.that(decrypted).is.equalTo(Buffer.from(plaintexts.tenChars, 'utf8'));
     });
@@ -126,8 +126,8 @@ describe('Content Encryption', (): void => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = await getRandomBuffer({ length: 4_232 });
 
-      const encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
-      const decryptedContent = decryptContent({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
+      const encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
+      const decryptedContent = decrypt({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
 
       assert.that(decryptedContent).is.equalTo(content);
     });
@@ -136,8 +136,8 @@ describe('Content Encryption', (): void => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = Buffer.from('', 'binary');
 
-      const encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
-      const decryptedContent = decryptContent({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
+      const encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
+      const decryptedContent = decrypt({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
 
       assert.that(decryptedContent).is.equalTo(content);
     });
@@ -149,7 +149,7 @@ describe('Content Encryption', (): void => {
       let exception = new Error('function did not throw an exception!');
 
       try {
-        decryptContent({ encryptedContent, masterKey, contentId: 'wronId' });
+        decrypt({ encryptedContent, masterKey, contentId: 'wronId' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -161,13 +161,13 @@ describe('Content Encryption', (): void => {
     test('throws unauthenticHeader exception on extendedContent.', async (): Promise<void> => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = await getRandomBuffer({ length: chunkSize });
-      const encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
+      const encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
       let exception = new Error('function did not throw an exception!');
       const extension = encryptedContent.slice(60, encryptedContent.length);
       const extended = Buffer.concat([ encryptedContent, extension ]);
 
       try {
-        decryptContent({ encryptedContent: extended, masterKey: randomMasterKey, contentId: 'id' });
+        decrypt({ encryptedContent: extended, masterKey: randomMasterKey, contentId: 'id' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -184,7 +184,7 @@ describe('Content Encryption', (): void => {
       encryptedContent = tamperHeader(encryptedContent);
 
       try {
-        decryptContent({ encryptedContent, masterKey, contentId: 'id' });
+        decrypt({ encryptedContent, masterKey, contentId: 'id' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -197,15 +197,15 @@ describe('Content Encryption', (): void => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content1 = await getRandomBuffer({ length: 10 });
       const content2 = await getRandomBuffer({ length: 10 });
-      const encryptedContent1 = await encryptContent({ content: content1, masterKey: randomMasterKey, contentId: 'id1' });
-      const encryptedContent2 = await encryptContent({ content: content2, masterKey: randomMasterKey, contentId: 'id2' });
+      const encryptedContent1 = await encrypt({ content: content1, masterKey: randomMasterKey, contentId: 'id1' });
+      const encryptedContent2 = await encrypt({ content: content2, masterKey: randomMasterKey, contentId: 'id2' });
       const header = encryptedContent1.slice(0, 60);
       const chunk2 = encryptedContent2.slice(60, encryptedContent2.length);
       const swappedEncryptedContent = Buffer.concat([ header, chunk2 ]);
       let exception = new Error('function did not throw an exception!');
 
       try {
-        decryptContent({ encryptedContent: swappedEncryptedContent, masterKey: randomMasterKey, contentId: 'id1' });
+        decrypt({ encryptedContent: swappedEncryptedContent, masterKey: randomMasterKey, contentId: 'id1' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -217,7 +217,7 @@ describe('Content Encryption', (): void => {
     test('throws unauthenticChunk exception on intra-content swapped chunks.', async (): Promise<void> => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = await getRandomBuffer({ length: 2 * chunkSize });
-      const encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
+      const encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
       const header = encryptedContent.slice(0, 60);
       const chunk1 = encryptedContent.slice(60, 60 + chunkSize + 28);
       const chunk2 = encryptedContent.slice(60 + chunkSize + 28, encryptedContent.length);
@@ -225,7 +225,7 @@ describe('Content Encryption', (): void => {
       let exception = new Error('function did not throw an exception!');
 
       try {
-        decryptContent({ encryptedContent: swappedEncryptedContent, masterKey: randomMasterKey, contentId: 'id' });
+        decrypt({ encryptedContent: swappedEncryptedContent, masterKey: randomMasterKey, contentId: 'id' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -237,14 +237,14 @@ describe('Content Encryption', (): void => {
     test('throws unauthenticChunk1 exception if chunk1 was tampared with.', async (): Promise<void> => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = await getRandomBuffer({ length: 2 * chunkSize });
-      let encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
+      let encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
       let exception = new Error('function did not throw an exception!');
 
       // Tampers with the second bit of the first byte of chunk 1
       encryptedContent = tamperChunk1(encryptedContent);
 
       try {
-        decryptContent({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
+        decrypt({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }
@@ -256,14 +256,14 @@ describe('Content Encryption', (): void => {
     test('throws unauthenticChunk2 exception if chunk2 was tampared with.', async (): Promise<void> => {
       const randomMasterKey = await getRandomBuffer({ length: 32 });
       const content = await getRandomBuffer({ length: 2 * chunkSize });
-      let encryptedContent = await encryptContent({ content, masterKey: randomMasterKey, contentId: 'id' });
+      let encryptedContent = await encrypt({ content, masterKey: randomMasterKey, contentId: 'id' });
       let exception = new Error('function did not throw an exception!');
 
       // Tampers with the second bit of the first byte of chunk 2
       encryptedContent = tamperChunk2(encryptedContent);
 
       try {
-        decryptContent({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
+        decrypt({ encryptedContent, masterKey: randomMasterKey, contentId: 'id' });
       } catch (ex: unknown) {
         exception = ex as Error;
       }

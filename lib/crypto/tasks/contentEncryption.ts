@@ -56,7 +56,7 @@ const decryptChunk = (encryptedChunk: Buffer, contentKey: Buffer, contentId: str
   }
 };
 
-const encryptContent = async ({ content, masterKey, contentId }: {
+const encrypt = async ({ content, masterKey, contentId }: {
   content: Buffer; masterKey: Buffer; contentId: string; }): Promise<Buffer> => {
   const chunkCount = Math.ceil(content.length / chunkSize);
   const headerNonce = await getRandomBuffer({ length: 12 });
@@ -77,7 +77,7 @@ const encryptContent = async ({ content, masterKey, contentId }: {
   return Buffer.concat([ headerNonce, encryptedContentKey, ...encryptedChunks ]);
 };
 
-const decryptContent = ({ encryptedContent, masterKey, contentId }: {
+const decrypt = ({ encryptedContent, masterKey, contentId }: {
   encryptedContent: Buffer; masterKey: Buffer; contentId: string; }): Buffer => {
   const [ headerNonce, encryptedContentKey, ...encryptedChunks ] = splitEncrypted(encryptedContent);
   const associatedString = `${contentId}_${encryptedChunks.length}`;
@@ -101,4 +101,4 @@ const decryptContent = ({ encryptedContent, masterKey, contentId }: {
   return Buffer.concat(chunks);
 };
 
-export { chunkSize, encryptContent, decryptContent, unauthenticChunkException, unauthenticHeaderException };
+export { chunkSize, encrypt, decrypt, unauthenticChunkException, unauthenticHeaderException };
