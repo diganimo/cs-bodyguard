@@ -1,7 +1,7 @@
 import { createScryptHash } from '../core/scrypt';
 import { getRandomBuffer } from '../core/random';
 import { MasterItem } from '../../index/indexItems/masterItem';
-import { updateIndexItemHmac } from './indexIntegrity';
+import { updateHmac } from './indexIntegrity';
 import { aesUnwrapKey, aesWrapKey, unauthenticException } from '../core/aesKeyWrap';
 
 interface KeyRing {
@@ -61,7 +61,7 @@ const init = async ({ password }: { password: string }): Promise<MasterItem> => 
     cipherSuite
   };
 
-  updateIndexItemHmac({ indexItem: masterItem, key: masterHmacKey });
+  updateHmac({ indexItem: masterItem, key: masterHmacKey });
 
   return masterItem;
 };
@@ -82,7 +82,7 @@ const updateKeys = async ({ oldPassword, newPassword, masterItem }: {
     // eslint-disable-next-line no-param-reassign
     masterItem.timestamp = Date.now();
 
-    updateIndexItemHmac({ indexItem: masterItem, key: masterHmacKey });
+    updateHmac({ indexItem: masterItem, key: masterHmacKey });
   } catch (ex: unknown) {
     throw getExceptionToThrow(ex as Error);
   }
