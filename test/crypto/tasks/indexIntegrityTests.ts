@@ -2,7 +2,7 @@ import { assert } from 'assertthat';
 import { createHmac } from '../../../lib/crypto/core/hmac';
 import { getRandomBuffer } from '../../../lib/crypto/core/random';
 import { IndexItem } from '../../../lib/index/indexItems/indexItem';
-import { checkIndexItemIntegrity, unauthenticException, updateIndexItemHmac } from '../../../lib/crypto/tasks/indexIntegrity';
+import { checkHmac, unauthenticException, updateHmac } from '../../../lib/crypto/tasks/indexIntegrity';
 
 describe('Index Item Integrity', (): void => {
   test('returns real hmac for given object.', async (): Promise<void> => {
@@ -18,7 +18,7 @@ describe('Index Item Integrity', (): void => {
     const data = JSON.stringify(dataObject);
     const expectedHmac = createHmac({ data, key });
 
-    updateIndexItemHmac({ indexItem, key });
+    updateHmac({ indexItem, key });
 
     // eslint-disable-next-line unicorn/consistent-destructuring
     assert.that(indexItem.hmac).is.equalTo(expectedHmac);
@@ -33,11 +33,11 @@ describe('Index Item Integrity', (): void => {
     };
     let exception = new Error('function did not throw an exception!');
 
-    updateIndexItemHmac({ indexItem, key });
+    updateHmac({ indexItem, key });
     indexItem.hmac = 'invalid';
 
     try {
-      checkIndexItemIntegrity({ indexItem, key });
+      checkHmac({ indexItem, key });
     } catch (ex: unknown) {
       exception = ex as Error;
     }
@@ -55,10 +55,10 @@ describe('Index Item Integrity', (): void => {
     };
     let exception: null | Error = null;
 
-    updateIndexItemHmac({ indexItem, key });
+    updateHmac({ indexItem, key });
 
     try {
-      checkIndexItemIntegrity({ indexItem, key });
+      checkHmac({ indexItem, key });
     } catch (ex: unknown) {
       exception = ex as Error;
     }

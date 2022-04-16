@@ -3,7 +3,7 @@ import { IndexItem } from '../../index/indexItems/indexItem';
 
 const unauthenticException = (id: string): Error => new Error(`Index Item with id ${id} is not authentic.`);
 
-const updateIndexItemHmac = ({ indexItem, key }: { indexItem: IndexItem; key: Buffer }): void => {
+const updateHmac = ({ indexItem, key }: { indexItem: IndexItem; key: Buffer }): void => {
   // eslint-disable-next-line prefer-const
   let { hmac, ...dataObject } = indexItem;
   const data = JSON.stringify(dataObject);
@@ -14,7 +14,7 @@ const updateIndexItemHmac = ({ indexItem, key }: { indexItem: IndexItem; key: Bu
   indexItem.hmac = hmac;
 };
 
-const checkIndexItemIntegrity = ({ indexItem, key }: { indexItem: IndexItem; key: Buffer }): void => {
+const checkHmac = ({ indexItem, key }: { indexItem: IndexItem; key: Buffer }): void => {
   const { hmac, ...dataObject } = indexItem;
   const data = JSON.stringify(dataObject);
 
@@ -25,4 +25,4 @@ const checkIndexItemIntegrity = ({ indexItem, key }: { indexItem: IndexItem; key
   }
 };
 
-export { checkIndexItemIntegrity, updateIndexItemHmac, unauthenticException };
+export { checkHmac, updateHmac, unauthenticException };
