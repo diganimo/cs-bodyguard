@@ -1,6 +1,6 @@
 import { assert } from 'assertthat';
 import forge from 'node-forge';
-import { changePassword, cipherParams, getKeyRing, init, invalidPasswordException } from '../../../lib/crypto/tasks/master';
+import { cipherParams, getKeyRing, init, invalidPasswordException, updateKeys } from '../../../lib/crypto/tasks/master';
 import * as scrypt from '../../../lib/crypto/core/scrypt';
 
 /* eslint-disable no-undef */
@@ -81,7 +81,7 @@ describe('Crypto Master', (): void => {
       const newPassword = 'newTestPassword';
       const masterItem = { ...initialMasterItem };
 
-      await changePassword({ oldPassword, newPassword, masterItem });
+      await updateKeys({ oldPassword, newPassword, masterItem });
 
       assert.that(masterItem.timestamp).is.equalTo(mockedModifiedTimestamp);
       assert.that(masterItem.wrappedMasterEncryptionKey).is.equalTo(expectedModifiedWrappedMasterEncryptionKey);
@@ -111,7 +111,7 @@ describe('Crypto Master', (): void => {
       const masterItem = { ...initialMasterItem };
       let exception = new Error('function did not throw an exception!');
 
-      await changePassword({ oldPassword, newPassword, masterItem }).catch((ex: Error): void => {
+      await updateKeys({ oldPassword, newPassword, masterItem }).catch((ex: Error): void => {
         exception = ex;
       });
 

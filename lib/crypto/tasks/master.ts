@@ -66,7 +66,7 @@ const init = async ({ password }: { password: string }): Promise<MasterItem> => 
   return masterItem;
 };
 
-const changePassword = async ({ oldPassword, newPassword, masterItem }: {
+const updateKeys = async ({ oldPassword, newPassword, masterItem }: {
   oldPassword: string; newPassword: string; masterItem: MasterItem; }): Promise<void> => {
   const { cpuFactor, memoryFactor, parallelism, kekLength } = cipherParams;
   const salt = Buffer.from(masterItem.salt, 'base64');
@@ -109,4 +109,4 @@ const getKeyRing = async ({ password, masterItem }: { password: string; masterIt
   }
 };
 
-export { init, changePassword, getKeyRing, cipherParams, invalidPasswordException };
+export { init, updateKeys, getKeyRing, cipherParams, invalidPasswordException, KeyRing };
