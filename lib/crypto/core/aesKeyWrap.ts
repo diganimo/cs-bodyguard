@@ -189,7 +189,7 @@ const aesUnwrapKey = ({ wrappedKey, kek }: { wrappedKey: Buffer; kek: Buffer }):
     throw unauthenticException;
   }
 
-  return Buffer.concat(R);
+  return join(R);
 };
 
 /* eslint-enable id-length */
