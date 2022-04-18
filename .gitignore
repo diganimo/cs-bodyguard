@@ -1,0 +1,10 @@
+# IDEs
+.idea
+.vscode
+*.iml
+
+# dependencies
+node_modules
+
+# targets
+build
