@@ -1,8 +1,7 @@
 import { IndexDelta } from './indexDelta';
 import { IndexItem } from './indexItems/indexItem';
-import { IndexStore } from './indexStore';
 import localforage from 'localforage';
-import { noSuchIndexItemException } from '../../lib/exceptions';
+import { IndexStore, noSuchIndexItemException } from './indexStore';
 
 interface BrowserIndexStore extends IndexStore {
   useInMemory: (memoryStorageDriver: any) => Promise<void>;
@@ -17,7 +16,7 @@ const browserIndexStore: BrowserIndexStore = {
     const item = await localforage.getItem(id);
 
     if (!item) {
-      throw noSuchIndexItemException({ id });
+      throw noSuchIndexItemException(id);
     }
 
     return item as IndexItem;
@@ -27,7 +26,7 @@ const browserIndexStore: BrowserIndexStore = {
     const existingItem = await localforage.getItem(id);
 
     if (!existingItem) {
-      throw noSuchIndexItemException({ id });
+      throw noSuchIndexItemException(id);
     }
 
     await localforage.removeItem(id);
