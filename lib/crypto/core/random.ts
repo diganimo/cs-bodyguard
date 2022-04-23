@@ -6,7 +6,7 @@ const forgeRandom = async function (length: number): Promise<string> {
     const sanitizedLength = length > 0 ? length : 1;
 
     try {
-      // Sync method is ok here, because we are wrapping it with promise
+      // Sync method is ok here, because we are wrapping it with promise. Simplifies testing.
       // eslint-disable-next-line no-sync
       resolve(forge.random.getBytesSync(sanitizedLength));
     } catch (ex: unknown) {
@@ -17,9 +17,8 @@ const forgeRandom = async function (length: number): Promise<string> {
 
 const getRandomBuffer = async function ({ length }: { length: number }): Promise<Buffer> {
   const bytes = await forgeRandom(length);
-  const hex = forge.util.bytesToHex(bytes);
 
-  return Buffer.from(hex, 'hex');
+  return Buffer.from(bytes, 'binary');
 };
 
 export { getRandomBuffer };

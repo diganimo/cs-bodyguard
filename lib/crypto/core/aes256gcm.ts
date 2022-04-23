@@ -32,11 +32,10 @@ const aes256gcmEncrypt = function ({ plain, key, iv, associated }: {
   cipher.update(plainForgeBuffer);
   cipher.finish();
 
-  const cipherHex = cipher.output.toHex();
-  const tagHex = cipher.mode.tag.toHex();
-  const cipherAndTagHex = `${cipherHex}${tagHex}`;
+  const ciphertext = Buffer.from(cipher.output.bytes(), 'binary');
+  const tag = Buffer.from(cipher.mode.tag.bytes(), 'binary');
 
-  return Buffer.from(cipherAndTagHex, 'hex');
+  return Buffer.concat([ ciphertext, tag ]);
 };
 
 const aes256gcmDecrypt = function ({ cipherAndTag, key, iv, associated }: {
@@ -68,9 +67,7 @@ const aes256gcmDecrypt = function ({ cipherAndTag, key, iv, associated }: {
     throw unauthenticException;
   }
 
-  const plainHex = cipher.output.toHex();
-
-  return Buffer.from(plainHex, 'hex');
+  return Buffer.from(cipher.output.bytes(), 'binary');
 };
 
 export { aes256gcmEncrypt, aes256gcmDecrypt, unauthenticException, invalidKeyLengthException, invalidIvLengthException };

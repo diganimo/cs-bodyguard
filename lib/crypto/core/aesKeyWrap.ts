@@ -93,10 +93,8 @@ const aesEncrypt = (key: Buffer, plaintext: Buffer): Buffer => {
   cipher.update(plainForgeBuffer);
   cipher.finish();
 
-  const encryptedHex = cipher.output.toHex();
-
   // Drop last 16 byte since this is the padding (padding can't be disabled with node-forge, unfortunately)
-  return Buffer.from(encryptedHex, 'hex').slice(0, -16);
+  return Buffer.from(cipher.output.bytes(), 'binary').slice(0, -16);
 };
 
 // Restore padding (padding can't be disabled with node-forge, unfortunately)
@@ -116,9 +114,7 @@ const aesDecrypt = (key: Buffer, ciphertext: Buffer): Buffer => {
   cipher.update(cipherForgeBuffer);
   cipher.finish();
 
-  const decryptedHex = cipher.output.toHex();
-
-  return Buffer.from(decryptedHex, 'hex');
+  return Buffer.from(cipher.output.bytes(), 'binary');
 };
 
 const doWrappingTransformation = (A: Buffer, R: Buffer[], kek: Buffer, n: number, j: number, i: number): void => {
