@@ -8,7 +8,8 @@
     "outDir": "build",
     "resolveJsonModule": true,
     "strict": true,
-    "target": "es2019"
+    "target": "es2019",
+    "noImplicitAny": false
   },
   "include": [
     "./**/*.ts"
