@@ -1,4 +1,5 @@
 # vault
+Wault (**w**eb v**ault** client) stores data in web securely, using authenticated encryption.
 
 TBD
 
