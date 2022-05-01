@@ -1,11 +1,11 @@
 {
-  "name": "diamory-common",
+  "name": "wault",
   "version": "0.0.1-alpha.1",
-  "description": "Common lib for diamory.",
+  "description": "Wault (web vault client) stores data in web securely, using authenticated encryption. ",
   "contributors": [
     {
-      "name": "Mark Herrmann",
-      "email": "mark.herrmann@diamory.de"
+      "name": "mark-herrmann",
+      "email": "github@markherrmann.com"
     }
   ],
   "private": false,
@@ -36,12 +36,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/diamory/diamory-common.git"
+    "url": "git://github.com/diganimo/wault.git"
   },
   "keywords": [
-    "diamory",
-    "common",
-    "lib"
+    "web",
+    "vault",
+    "client",
+    "crypto",
+    "secure",
+    "encryption",
+    "encrypted",
+    "authenticated"
   ],
   "license": "AGPL-3.0-or-later",
   "jest": {
