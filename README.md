@@ -1,4 +1,4 @@
-# vault
+# cs-bodyguard
 **cs-bodyguard** (**c**lient-**s**ide, **c**ryptographical response and request **body guard**) stores data in web, securely, using authenticated encryption.
 
 TBD
