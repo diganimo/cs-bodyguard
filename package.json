@@ -1,7 +1,7 @@
 {
-  "name": "wault",
+  "name": "cs-bodyguard",
   "version": "0.0.1-alpha.1",
-  "description": "Wault (web vault client) stores data in web securely, using authenticated encryption.",
+  "description": "cs-bodyguard (client-side, cryptographical response and request body guard) stores data in web, securely, using authenticated encryption.",
   "contributors": [
     {
       "name": "mark-herrmann",
@@ -36,14 +36,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/diganimo/wault.git"
+    "url": "git://github.com/diganimo/cs-bodyguard.git"
   },
   "keywords": [
     "web",
-    "vault",
+    "guard",
     "client",
+    "body",
     "crypto",
     "secure",
+    "securely",
     "encryption",
     "encrypted",
     "authenticated"
